@@ -1,6 +1,6 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from leads.models import Lead
@@ -217,7 +217,7 @@ class DashboardAnalyticsView(APIView):
     Returns high-level aggregated metrics for the analytics page.
     Accepts ?days=N query param (default 30).
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         from django.utils import timezone
@@ -225,11 +225,24 @@ class DashboardAnalyticsView(APIView):
         from django.db.models import Count, Q
         from django.db.models.functions import TruncDate
 
-        days = min(int(request.query_params.get('days', 30)), 365)
+        org = getattr(request.user, 'organization', None)
+        if org is None:
+            return Response(
+                {'detail': 'Organization context required for analytics.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        days_param = request.query_params.get('days', 30)
+        try:
+            days = int(days_param)
+        except (TypeError, ValueError):
+            days = 30
+        days = max(1, min(days, 365))
+
         cutoff = timezone.now() - timedelta(days=days)
 
         # ── Aggregate KPIs from CampaignLead ──
-        all_cls = CampaignLead._default_manager.all()
+        all_cls = CampaignLead.objects.filter(organization=org)
 
         sent_statuses = ['ACTIVE', 'FINISHED', 'REPLIED', 'BOUNCED']
         emails_sent = all_cls.filter(status__in=sent_statuses).count()
@@ -238,8 +251,8 @@ class DashboardAnalyticsView(APIView):
         clicked = all_cls.filter(last_clicked_at__isnull=False).count()
         bounced = all_cls.filter(status='BOUNCED').count()
 
-        total_leads = Lead._default_manager.all().count()
-        active_campaigns = Campaign._default_manager.filter(status='ACTIVE').count()
+        total_leads = Lead.objects.filter(organization=org).count()
+        active_campaigns = Campaign.objects.filter(organization=org, status='ACTIVE').count()
 
         open_rate = round((opened / emails_sent * 100) if emails_sent > 0 else 0, 1)
         reply_rate = round((replied / emails_sent * 100) if emails_sent > 0 else 0, 1)
@@ -285,8 +298,8 @@ class DashboardAnalyticsView(APIView):
 
         # ── Per-campaign breakdown ──
         campaign_stats = []
-        for c in Campaign._default_manager.all().order_by('-created_at')[:20]:
-            cls = CampaignLead._default_manager.filter(campaign=c)
+        for c in Campaign.objects.filter(organization=org).order_by('-created_at')[:20]:
+            cls = CampaignLead.objects.filter(campaign=c, organization=org)
             c_sent = cls.filter(status__in=sent_statuses).count()
             c_opened = cls.filter(last_opened_at__isnull=False).count()
             c_replied = cls.filter(status='REPLIED').count()
