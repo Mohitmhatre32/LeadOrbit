@@ -38,6 +38,50 @@ function initThemeToggle() {
 
 applyTheme(getTheme());
 
+function setActiveNavLink() {
+    const pathname = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    // Skip if no nav links found (e.g., on login/register pages)
+    if (navLinks.length === 0) return;
+    
+    // Remove active class from all links
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    // Determine which nav link should be active based on current page
+    let activeHref = '/dashboard.html'; // default
+    
+    // Use regex to match page names more precisely
+    if (/campaign-builder\.html/i.test(pathname)) {
+        // Campaign builder should highlight Campaigns link
+        activeHref = '/campaigns.html';
+    } else if (/dashboard\.html/i.test(pathname)) {
+        activeHref = '/dashboard.html';
+    } else if (/leads\.html/i.test(pathname)) {
+        activeHref = '/leads.html';
+    } else if (/campaigns\.html/i.test(pathname)) {
+        activeHref = '/campaigns.html';
+    } else if (/analytics\.html/i.test(pathname)) {
+        activeHref = '/analytics.html';
+    } else if (/settings\.html/i.test(pathname)) {
+        activeHref = '/settings.html';
+    }
+    
+    // Find and highlight the matching nav link
+    const activeLink = document.querySelector(`a.nav-link[href="${activeHref}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+// Set active link when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setActiveNavLink);
+} else {
+    // DOM is already loaded (for dynamic navigation)
+    setActiveNavLink();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     initThemeToggle();
 
