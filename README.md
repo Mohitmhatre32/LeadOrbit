@@ -18,6 +18,7 @@ This README is based on the current codebase, not the older planning documents i
 - [Testing](#testing)
 - [Current Caveats](#current-caveats)
 - [Integration Notes](#integration-notes)
+- [Contributors](#-contributors)
 
 ## What Works Today
 
@@ -451,3 +452,8 @@ Current repo state: `27` backend tests pass. The suite covers auth/profile updat
 - If no AI credentials are configured, the campaign builder AI composer still returns a deterministic fallback draft instead of failing hard.
 
 
+## Contributors
+
+Thanks to all contributors for their valuable efforts and support in making LeadOrbit better! ❤️
+
+[![Contributors](https://contrib.rocks/image?repo=Kuldeeep18/LeadOrbit)](https://github.com/Kuldeeep18/LeadOrbit/graphs/contributors)
