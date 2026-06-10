@@ -68,21 +68,21 @@
                             <p class="text-white-50 small">Create your account to get started.</p>
                         </div>
 
-                        <form>
+                        <form aria-label="Registration form">
                             <div class="row mb-3">
                                 <div class="col-6">
                                     <label for="firstName" class="form-label text-white-50 small fw-semibold">First Name</label>
                                     <div class="input-group">
-                                        <span class="input-group-text  input-group-text-custom"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control form-control-lg fs-6 custom-input" id="firstName"
+                                        <span class="input-group-text  input-group-text-custom"><i class="bi bi-person" aria-hidden="true" ></i></span>
+                                        <input type="text" class="form-control form-control-lg fs-6 custom-input" id="firstName" autocomplete="given-name"
                                             placeholder="Jane" required style="border-left: none !important;">
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <label for="lastName" class="form-label text-white-50 small fw-semibold">Last Name</label>
                                     <div class="input-group">
-                                        <span class="input-group-text input-group-text-custom"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control form-control-lg fs-6 custom-input" id="lastName"
+                                        <span class="input-group-text input-group-text-custom"><i class="bi bi-person" aria-hidden="true"></i></span>
+                                        <input type="text" class="form-control form-control-lg fs-6 custom-input" id="lastName"  autocomplete="family-name"
                                             placeholder="Doe" required style="border-left: none !important;">
                                     </div>
                                 </div>
@@ -91,17 +91,17 @@
                             <div class="mb-3">
                                 <label for="emailAddress" class="form-label text-white-50 small fw-semibold">Email Address</label>
                                 <div class="input-group">
-                                    <span class="input-group-text input-group-text-custom"><i class="bi bi-envelope"></i></span>
-                                    <input type="email" class="form-control form-control-lg fs-6 custom-input" id="emailAddress"
+                                    <span class="input-group-text input-group-text-custom"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+                                    <input type="email" class="form-control form-control-lg fs-6 custom-input" id="emailAddress"  autocomplete="email"
                                         placeholder="name@example.com" required style="border-left: none !important;">
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <label for="password" class="form-label text-muted small fw-semibold">Password</label>
                                 <div class="password-toggle-wrapper">
-                                    <input type="password" class="form-control form-control-lg fs-6" id="password"
+                                    <input type="password" class="form-control form-control-lg fs-6" id="password" autocomplete="new-password"
                                         placeholder="Min. 8 characters" required>
-                                    <button type="button" id="passwordToggle" class="password-toggle-btn" aria-label="Show password">👁</button>
+                                    <button type="button" id="passwordToggle" class="password-toggle-btn" aria-label="Show password" aria-controls="password">👁</button>
                                 </div>
                             </div>
 

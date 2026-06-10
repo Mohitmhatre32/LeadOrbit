@@ -881,20 +881,20 @@
     <div class="top-bar">
         <div class="d-flex align-items-center gap-3">
             <a href="/campaigns.html" style="color:#64748b; text-decoration:none; font-size:1.2rem;"><i
-                    class="bi bi-x-lg"></i></a>
-            <i class="bi bi-diagram-3" style="color:#94a3b8;"></i>
-            <input type="text" class="campaign-name" id="campaign-name" value="New Campaign">
-            <button class="status-toggle off" id="status-toggle" title="Toggle Active/Inactive"></button>
-            <i class="bi bi-gear" style="color:#94a3b8; cursor:pointer;" id="settings-icon"></i>
+                    class="bi bi-x-lg" aria-hidden="true"></i></a>
+            <i class="bi bi-diagram-3" style="color:#94a3b8;" aria-hidden="true"></i>
+            <input type="text" class="campaign-name" id="campaign-name" value="New Campaign" aria-label="Campaign name">
+            <button class="status-toggle off" id="status-toggle" title="Toggle Active/Inactive" aria-label="Toggle campaign status" ></button>
+            <i class="bi bi-gear" style="color:#94a3b8; cursor:pointer;" id="settings-icon" aria-hidden="true"></i>
         </div>
         <div class="d-flex align-items-center gap-3">
             <div class="tab-pills">
-                <div class="tab active" data-tab="sequence"><i class="bi bi-diagram-3 me-1"></i> Sequence</div>
-                <div class="tab" data-tab="leads"><i class="bi bi-people me-1"></i> Lead list</div>
-                <div class="tab" data-tab="launch"><i class="bi bi-rocket me-1"></i> Launch</div>
+                <div class="tab active" data-tab="sequence"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i> Sequence</div>
+                <div class="tab" data-tab="leads"><i class="bi bi-people me-1" aria-hidden="true"></i> Lead list</div>
+                <div class="tab" data-tab="launch"><i class="bi bi-rocket me-1" aria-hidden="true"></i> Launch</div>
             </div>
             <button class="btn btn-primary btn-sm px-3 fw-semibold" id="next-step-btn">
-                Next step <i class="bi bi-chevron-right ms-1"></i>
+                Next step <i class="bi bi-chevron-right ms-1" aria-hidden="true"></i>
             </button>
         </div>
     </div>
