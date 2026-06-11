@@ -226,11 +226,48 @@ class WebhookView(APIView):
     to track opens, clicks, bounces.
     """
     permission_classes = [AllowAny] # Webhooks need to be publicly accessible
+
+    @staticmethod
+    def _extract_bounce_details(payload):
+        bounce_payload = payload.get('bounce')
+        if not isinstance(bounce_payload, dict):
+            bounce_payload = {}
+
+        bounce_type = (
+            payload.get('bounce_type')
+            or bounce_payload.get('type')
+            or bounce_payload.get('bounce_type')
+            or payload.get('type')
+            or ''
+        )
+        bounce_code = (
+            payload.get('code')
+            or bounce_payload.get('code')
+            or bounce_payload.get('smtp_code')
+            or bounce_payload.get('status')
+            or ''
+        )
+        bounce_reason = (
+            payload.get('reason')
+            or payload.get('description')
+            or bounce_payload.get('reason')
+            or bounce_payload.get('description')
+            or bounce_payload.get('detail')
+            or payload.get('message')
+            or ''
+        )
+
+        return {
+            'bounce_type': str(bounce_type).strip().lower() or None,
+            'bounce_code': str(bounce_code).strip() or None,
+            'bounce_reason': str(bounce_reason).strip() or None,
+        }
     
     def post(self, request, *args, **kwargs):
         event_type = (request.data.get('event') or '').strip().lower()
         lead_email = request.data.get('email')
         message_id = request.data.get('message_id') or request.data.get('messageId')
+        bounce_details = self._extract_bounce_details(request.data)
         
         # Simple MVP tracking
         if event_type and lead_email:
@@ -255,7 +292,25 @@ class WebhookView(APIView):
                 for cl in cleads:
                     if event_type == 'bounce':
                         cl.status = 'BOUNCED'
-                        cl.save(update_fields=['status'])
+                        if bounce_details['bounce_type']:
+                            cl.bounce_type = bounce_details['bounce_type']
+                        if bounce_details['bounce_code']:
+                            cl.bounce_code = bounce_details['bounce_code']
+                        if bounce_details['bounce_reason']:
+                            cl.bounce_reason = bounce_details['bounce_reason']
+                        cl.save(update_fields=[
+                            'status',
+                            'bounce_type',
+                            'bounce_code',
+                            'bounce_reason',
+                        ])
+                        logger.info(
+                            'Webhook bounce processed for email=%s type=%s code=%s reason=%s',
+                            lead_email,
+                            cl.bounce_type or 'unknown',
+                            cl.bounce_code or 'unknown',
+                            cl.bounce_reason or 'unknown',
+                        )
                     elif event_type == 'reply':
                         cl.last_replied_at = now
                         # Only hard-stop if there is no reply-yes branch configured.

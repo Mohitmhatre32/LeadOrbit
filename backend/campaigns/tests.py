@@ -1114,6 +1114,46 @@ class CampaignWorkflowTests(APITestCase):
             any('Webhook processing error for event=open email=lead@acme.test' in entry for entry in logs.output)
         )
 
+    def test_email_webhook_persists_bounce_metadata(self):
+        campaign = Campaign.objects.create(
+            organization=self.organization,
+            name='Bounce metadata flow',
+            status='ACTIVE',
+        )
+        lead = Lead.objects.create(
+            organization=self.organization,
+            email='bounce@acme.test',
+        )
+        campaign_lead = CampaignLead.objects.create(
+            organization=self.organization,
+            campaign=campaign,
+            lead=lead,
+            status='ACTIVE',
+            last_sent_message_id='msg-123',
+        )
+
+        response = self.client.post(
+            '/api/v1/webhooks/email/',
+            {
+                'event': 'bounce',
+                'email': 'bounce@acme.test',
+                'message_id': 'msg-123',
+                'bounce': {
+                    'type': 'soft',
+                    'code': 'mailbox_full',
+                    'reason': 'Mailbox full',
+                },
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        campaign_lead.refresh_from_db()
+        self.assertEqual(campaign_lead.status, 'BOUNCED')
+        self.assertEqual(campaign_lead.bounce_type, 'soft')
+        self.assertEqual(campaign_lead.bounce_code, 'mailbox_full')
+        self.assertEqual(campaign_lead.bounce_reason, 'Mailbox full')
+
     def test_dashboard_analytics_isolates_data_by_tenant(self):
         org2 = Organization.objects.create(name='Other Corp')
         other_user = User.objects.create_user(
