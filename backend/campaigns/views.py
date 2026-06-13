@@ -391,6 +391,11 @@ class WebhookView(APIView):
                     e,
                 )
                 
+                return Response(
+                    {"error": "Webhook processing failed"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+                            
         return Response({"status": "received"}, status=status.HTTP_200_OK)
 
 class DashboardAnalyticsView(APIView):
