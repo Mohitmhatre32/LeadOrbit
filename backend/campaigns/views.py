@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from leads.models import Lead
+from users.permissions import IsOrgManager
 
 from .models import Campaign, CampaignLead, SequenceStep, EmailTemplate
 from .serializers import CampaignSerializer, SequenceStepSerializer, EmailTemplateSerializer
@@ -21,6 +22,22 @@ logger = logging.getLogger(__name__)
 class CampaignViewSet(viewsets.ModelViewSet):
     serializer_class = CampaignSerializer
     queryset = Campaign.objects.all()
+    manager_actions = frozenset({
+        'create',
+        'update',
+        'partial_update',
+        'destroy',
+        'enroll',
+        'launch',
+        'pause',
+        'resume',
+    })
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.action in self.manager_actions:
+            permissions.append(IsOrgManager())
+        return permissions
 
     def get_queryset(self):
         return (
@@ -306,6 +323,13 @@ class CampaignViewSet(viewsets.ModelViewSet):
 class SequenceStepViewSet(viewsets.ModelViewSet):
     serializer_class = SequenceStepSerializer
     queryset = SequenceStep.objects.all()
+    manager_actions = frozenset({'create', 'update', 'partial_update', 'destroy'})
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.action in self.manager_actions:
+            permissions.append(IsOrgManager())
+        return permissions
 
     def get_queryset(self):
         return SequenceStep.objects.filter(organization=self.request.user.organization)
