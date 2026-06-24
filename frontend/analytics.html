@@ -286,6 +286,11 @@
                 const listEl = document.getElementById('benchmark-recommendations-list');
                 if (!insightsSection || !listEl) return;
 
+                if (!data.emails_sent || data.emails_sent === 0) {
+                    insightsSection.classList.add('d-none');
+                    return;
+                }
+
                 insightsSection.classList.remove('d-none');
 
                 let openHTML = '';
@@ -521,6 +526,11 @@
                                 title: {
                                     display: true,
                                     text: 'Percentage (%)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
                                 }
                             } 
                         },
